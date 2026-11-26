@@ -147,7 +147,6 @@
       position: relative;
       z-index: 20;               /* above the game's full-page click layer */
     }
-    @media (max-width: 632px) { #offline-info { padding: 0 16px; } }
     @media (prefers-color-scheme: dark) {
       #offline-info { color: var(--text-color, #9aa0a6); }
     }
@@ -257,11 +256,19 @@
   });
 
   // ---------------------------------------------------------------------
-  // Place the box a fixed distance below the game's canvas, however tall
-  // the game's own wrapper is (a negative margin is fine here)
+  // Line the box up with the game. The game's canvas is as wide as its
+  // wrapper minus the wrapper's side padding (which Chromium's CSS changes
+  // with the window size), so we copy that padding. Then place the box a
+  // fixed distance below the canvas (a negative margin is fine here).
   // ---------------------------------------------------------------------
   function place() {
+    const wrapper = document.querySelector(".interstitial-wrapper");
     const runner = document.querySelector(".runner-container");
+    if (wrapper) {
+      const cs = getComputedStyle(wrapper);
+      box.style.paddingLeft = cs.paddingLeft;
+      box.style.paddingRight = cs.paddingRight;
+    }
     box.style.paddingBottom = "40px";
     if (!runner) { box.style.marginTop = "40px"; return; }
     box.style.marginTop = "0px";
