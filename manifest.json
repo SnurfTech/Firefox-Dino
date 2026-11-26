@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Firefox Dino",
+  "version": "1.0",
+  "description": "Adds the classic Chrome Dino game to Firefox when you have no internet.",
+
+  "icons": {
+    "48": "icons/dino-48.png"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firefoxdino@snurftech.com",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
+  "permissions": ["tabs", "webNavigation", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>No internet</title>
+  <style>
+    body {
+      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #5f6368;
+      margin: 0;
+      padding: 60px 8% 40px;
+      max-width: 700px;
+    }
+    .icon {
+      width: 48px;
+      image-rendering: pixelated;
+      margin-bottom: 40px;
+    }
+    h1 { font-size: 1.6em; font-weight: normal; color: #202124; margin: 0 0 24px; }
+    p { margin: 0 0 8px; }
+    ul { margin: 8px 0 24px; padding-left: 32px; line-height: 1.7; }
+    .code { font-size: .75em; margin-bottom: 30px; }
+    a { color: #1a73e8; cursor: pointer; }
+    iframe {
+      width: 100%;
+      height: 260px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <img class="icon" src="icons/dino-48.png" alt="">
+  <h1>No internet</h1>
+  <p>Try:</p>
+  <ul>
+    <li>Checking the network cables, modem, and router</li>
+    <li>Reconnecting to Wi-Fi</li>
+  </ul>
+  <div class="code" id="code"></div>
+  <p id="target"></p>
+  <p><a id="retry">Try again</a></p>
+
+  <iframe id="game" src="dino.html"></iframe>
+
+  <script src="offline.js"></script>
+</body>
+</html>
