@@ -24,7 +24,7 @@ jobs:
 
       - name: Download and patch new build
         run: |
-          wget https://github.com/SnurfTech/Chrome-Dino/releases/latest/download/dino.min.html -o dino.html
+          wget https://github.com/SnurfTech/Chrome-Dino/releases/latest/download/dino.html
           python3 patch.py
 
       - name: Zip project with new build
