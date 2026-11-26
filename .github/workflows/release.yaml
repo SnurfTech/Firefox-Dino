@@ -18,9 +18,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Compute next version
+        run: |
+          set -euo pipefail
+
+          # Get the latest release tag (empty if none exist yet)
+          LATEST=$(gh release list --limit 1 --exclude-drafts --json tagName --jq '.[0].tagName // empty')
+
+          if [[ -z "$LATEST" ]]; then
+            VERSION="0.1"
+          else
+            # Strip a leading "v" if present, then split into major.minor
+            CLEAN="${LATEST#v}"
+            MAJOR="${CLEAN%%.*}"
+            MINOR="${CLEAN#*.}"
+            VERSION="${MAJOR}.$((MINOR + 1))"
+          fi
+
+          echo "Next version: $VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Update manifest.json version
+        run: |
+          set -euo pipefail
+          jq --arg v "$VERSION" '.version = $v' manifest.json > manifest.tmp
+          mv manifest.tmp manifest.json
+          grep '"version"' manifest.json
+
       - name: Delete old Dino game build
         run: |
-          rm dino*
+          rm -f dino*
 
       - name: Download and patch new build
         run: |
@@ -31,23 +58,10 @@ jobs:
         run: |
           zip unsigned.zip icons/* *.js *.html manifest.json
 
-      - name: Create or update release
+      - name: Create release
         run: |
           set -euo pipefail
           FILES=(unsigned.zip)
-
-          # Get the latest release tag (empty if none exist yet)
-          LATEST=$(gh release list --limit 1 --exclude-drafts --json tagName --jq '.[0].tagName // empty')
-
-          if [[ -z "$LATEST" ]]; then
-            VERSION="0.1"
-          else
-          # Strip a leading "v" if present, then split into major.minor
-            CLEAN="${LATEST#v}"
-            MAJOR="${CLEAN%%.*}"
-            MINOR="${CLEAN#*.}"
-            VERSION="${MAJOR}.$((MINOR + 1))"
-          fi
 
           echo "Creating release $VERSION"
           gh release create "$VERSION" "${FILES[@]}" \
