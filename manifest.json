@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Firefox Dino",
+  "name": "Dino for Firefox",
   "version": "1.0",
   "description": "Adds the classic Chrome Dino game to Firefox when you have no internet.",
 
