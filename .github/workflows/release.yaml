@@ -1,0 +1,57 @@
+name: Build & Release Unsigned
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete old Dino game build
+        run: |
+          rm dino*
+
+      - name: Download and patch new build
+        run: |
+          wget https://github.com/SnurfTech/Chrome-Dino/releases/latest/download/dino.min.html -o dino.html
+          python3 patch.py
+
+      - name: Zip project with new build
+        run: |
+          zip unsigned.zip icons/ *.js *.html manifest.json
+
+      - name: Create or update release
+        run: |
+          set -euo pipefail
+          FILES=(unsigned.zip)
+
+          # Get the latest release tag (empty if none exist yet)
+          LATEST=$(gh release list --limit 1 --exclude-drafts --json tagName --jq '.[0].tagName // empty')
+
+          if [[ -z "$LATEST" ]]; then
+            VERSION="0.1"
+          else
+          # Strip a leading "v" if present, then split into major.minor
+            CLEAN="${LATEST#v}"
+            MAJOR="${CLEAN%%.*}"
+            MINOR="${CLEAN#*.}"
+            VERSION="${MAJOR}.$((MINOR + 1))"
+          fi
+
+          echo "Creating release $VERSION"
+          gh release create "$VERSION" "${FILES[@]}" \
+            --target "$GITHUB_SHA" \
+            --title "$VERSION" \
+            --notes "This is the unsigned build for this extension. To download the signed build and install it normally, go [here](example.com)"
+            --latest
