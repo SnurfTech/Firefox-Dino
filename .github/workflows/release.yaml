@@ -29,7 +29,7 @@ jobs:
 
       - name: Zip project with new build
         run: |
-          zip unsigned.zip icons/ *.js *.html manifest.json
+          zip unsigned.zip icons/* *.js *.html manifest.json
 
       - name: Create or update release
         run: |
