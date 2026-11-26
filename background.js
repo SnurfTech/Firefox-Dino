@@ -11,22 +11,13 @@ function shouldIgnore(error) {
   );
 }
 
-const retried = new Map(); // "tabId|url" -> timestamp of last auto-retry
-
 function handleError(tabId, originalUrl, error) {
-  if (!originalUrl || originalUrl.startsWith("moz-extension://")) return;
+  // Only ordinary web pages
+  if (!originalUrl || !/^https?:/i.test(originalUrl)) return;
 
+  // Online: never touch the tab. Firefox's own error page (if any) stays.
   if (navigator.onLine) {
-    // Browser thinks we're online: treat as a blip, retry once per URL
-    const key = tabId + "|" + originalUrl;
-    const last = retried.get(key) || 0;
-    if (Date.now() - last > 10000) {
-      retried.set(key, Date.now());
-      console.log("Online, retrying:", error, originalUrl);
-      browser.tabs.update(tabId, { url: originalUrl });
-    } else {
-      console.log("Online, already retried; leaving Firefox's page:", error);
-    }
+    console.log("Online, leaving the tab alone:", error, originalUrl);
     return;
   }
 
@@ -52,19 +43,4 @@ browser.webNavigation.onErrorOccurred.addListener((details) => {
   if (details.frameId !== 0) return;
   if (shouldIgnore(details.error)) return;
   handleError(details.tabId, details.url, details.error);
-});
-
-const DINO_URL = browser.runtime.getURL("dino.html");
-
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "complete") return;
-  if (!tab.url || !tab.url.startsWith(DINO_URL)) return;
-
-  // Only inject when we got here from a failed navigation
-  const params = new URL(tab.url).searchParams;
-  if (!params.get("url") && !params.get("error")) return;
-
-  browser.scripting
-    .executeScript({ target: { tabId }, files: ["offline-info.js"] })
-    .catch((e) => console.error("Injection failed:", e));
 });
