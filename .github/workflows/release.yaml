@@ -53,5 +53,5 @@ jobs:
           gh release create "$VERSION" "${FILES[@]}" \
             --target "$GITHUB_SHA" \
             --title "$VERSION" \
-            --notes "This is the unsigned build for this extension. To download the signed build and install it normally, go [here](example.com)"
+            --notes "This is the unsigned build for this extension. To download the signed build and install it normally, go [here](example.com)" \
             --latest
